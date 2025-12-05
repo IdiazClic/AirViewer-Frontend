@@ -1,0 +1,46 @@
+/* AirViewer/frontend/css/style.css */
+
+/* 1. BUENA (0-50) */
+.aqi-buena { 
+    background-color: #198754 !important; /* Verde */
+    border-color: #198754 !important; 
+}
+
+/* 2. MODERADA (51-100) */
+.aqi-moderada { 
+    background-color: #ffc107 !important; /* Amarillo */
+    color: #333 !important;
+    border-color: #ffc107 !important; 
+}
+
+/* 3. NO SALUDABLE PARA GRUPOS SENSIBLES (101-150) */
+.aqi-sensible { 
+    background-color: #fd7e14 !important; /* Naranja (Añadido) */
+    border-color: #fd7e14 !important; 
+}
+
+/* 4. NO SALUDABLE (151-200) */
+.aqi-insalubre { 
+    background-color: #dc3545 !important; /* Rojo */
+    border-color: #dc3545 !important; 
+}
+
+/* 5. MUY NO SALUDABLE (201-300) */
+.aqi-muy-insalubre { 
+    background-color: #6f42c1 !important; /* Púrpura (Añadido) */
+    border-color: #6f42c1 !important; 
+}
+
+/* 6. PELIGROSA (301+) */
+.aqi-peligrosa { 
+    background-color: #343a40 !important; /* Negro/Gris oscuro (Añadido) */
+    border-color: #343a40 !important; 
+}
+
+/* Estilos adicionales de presentación */
+.card {
+    border-radius: 12px;
+}
+.aqi-value {
+    font-weight: 700;
+}
