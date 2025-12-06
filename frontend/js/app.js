@@ -8,7 +8,7 @@
 // 1. CONFIGURACIÓN Y DECLARACIONES GLOBALES
 // =======================================================
 
-const API_BASE_URL = 'http://localhost:5000/api/v1'; 
+const API_BASE_URL = 'https://airviewer.onrender.com'; 
 const navMap = {
     'nav-dashboard': 'dashboard-module',
     'nav-prediction': 'prediction-module',
@@ -526,4 +526,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // Muestra el Dashboard por defecto al cargar
     showModule('dashboard-module', 'nav-dashboard');
     loadRealTimeData(); 
+
 });
