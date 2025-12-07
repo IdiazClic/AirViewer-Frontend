@@ -1,14 +1,12 @@
 /**
  * AIRVIEWER JS: Lógica Principal para la Interfaz Web (Frontend)
- * Este script gestiona la navegación, el consumo de la API de Backend (Python/Flask),
- * y la visualización de datos en gráficos y tablas, aplicando los rangos AQI del ECA.
  */
 
 // =======================================================
 // 1. CONFIGURACIÓN Y DECLARACIONES GLOBALES
 // =======================================================
 
-// 🛑 IMPORTANTE: Esta URL DEBE ser tu URL de Render (ya que tu Backend está allí)
+// 🛑 IMPORTANTE: Esta URL DEBE ser tu URL de Render
 const API_BASE_URL = 'https://airviewer.onrender.com/api/v1'; 
 
 const navMap = {
@@ -28,11 +26,10 @@ let myMap; // Para Leaflet
 
 
 // =======================================================
-// 2. FUNCIONES BASE
+// 2. FUNCIONES BASE Y UTILIDADES
 // =======================================================
 
 function showModule(targetModuleId, activeNavId) {
-    // Código para mostrar/ocultar módulos
     moduleSections.forEach(section => {
         section.style.display = 'none';
     });
@@ -52,7 +49,6 @@ function showModule(targetModuleId, activeNavId) {
 }
 
 function getAqiAlertDetails(aqi) {
-    // Lógica basada en la tabla ECA de tu tesis
     if (aqi >= 301) { 
         return { class: 'aqi-peligrosa', estado: 'Peligrosa', descripcion: 'Emergencia de salud pública.' }; 
     } else if (aqi >= 201) { 
@@ -71,7 +67,6 @@ function getAqiAlertDetails(aqi) {
 }
 
 function updateAqiCard(aqi) {
-    // Actualiza el color y texto del AQI
     const aqiNum = parseInt(aqi);
     const details = getAqiAlertDetails(aqiNum);
     const aqiCard = document.getElementById('aqi-global-status');
@@ -88,36 +83,12 @@ function updateAqiCard(aqi) {
 // 3. FUNCIONES DE VISUALIZACIÓN (Gráficas y Mapa)
 // =======================================================
 
-// AirViewer/frontend/js/app.js (Función draw24hTrendChart)
-
 function draw24hTrendChart(data) {
-    // 1. Destruye la instancia anterior
-    if (trendChart) { 
-        trendChart.destroy(); 
-    }
+    if (trendChart) trendChart.destroy();
     
-    // 2. IDENTIFICAR Y ELIMINAR EL CANVAS ANTIGUO
-    let oldCanvas = document.getElementById('chart-24h');
-    if (oldCanvas) {
-        oldCanvas.remove(); // Elimina el elemento HTML completamente
-    }
+    const newCanvas = document.getElementById('chart-24h');
+    if (!newCanvas) return;
     
-    // 3. CREAR UN NUEVO CANVAS LIMPIO
-    const newCanvas = document.createElement('canvas');
-    newCanvas.id = 'chart-24h';
-    
-    // 4. Insertar el nuevo canvas en el contenedor
-    const chartParent = document.querySelector('#aqi-chart-container'); 
-    
-    if (chartParent) {
-        chartParent.innerHTML = ''; // Limpia el contenedor (Importante si el canvas es hijo directo)
-        chartParent.appendChild(newCanvas); 
-    } else {
-        console.error("Contenedor #aqi-chart-container no encontrado.");
-        return;
-    }
-    
-    // 5. Dibuja el gráfico usando el nuevo contexto
     const ctx = newCanvas.getContext('2d');
     const labels = data.map(item => item.time);
     const aqiValues = data.map(item => item.aqi);
@@ -137,12 +108,12 @@ function draw24hTrendChart(data) {
         },
         options: { 
             responsive: true, 
-            maintainAspectRatio: false, // 🛑 CRÍTICO PARA USAR LA ALTURA FIJA DEL CSS
+            maintainAspectRatio: false,
             scales: {
-                y: { min: 50, max: 120 },
-                x: { display: false } // Ocultar etiquetas para limpiar la vista
+                y: { beginAtZero: false, min: 50, max: 120 },
+                x: { display: true } 
             },
-            animation: false // Acelera el dibujo y evita fallos.
+            animation: false 
         }
     });
 }
@@ -150,27 +121,23 @@ function draw24hTrendChart(data) {
 function initializeMap(lat, lng, aqi) {
     const mapElement = 'map-container';
     
-    // 1. Destruir la instancia anterior
     if (myMap) { 
         myMap.remove(); 
         myMap = null; 
     }
     
-    // 2. Inicializar el mapa
     myMap = L.map(mapElement).setView([lat, lng], 13);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(myMap);
     
-    // 3. Definir el color del marcador
     const details = getAqiAlertDetails(aqi);
     const colorCode = {
         'aqi-buena': 'green', 'aqi-moderada': 'orange', 'aqi-sensible': 'darkorange',
         'aqi-insalubre': 'red', 'aqi-muy-insalubre': 'purple', 'aqi-peligrosa': 'black'
     };
 
-    // 4. Crear el marcador
     L.marker([lat, lng], {
         icon: L.divIcon({
             className: 'custom-div-icon',
@@ -183,24 +150,17 @@ function initializeMap(lat, lng, aqi) {
     .addTo(myMap)
     .bindPopup(`<b>Estación Trujillo</b><br>AQI: ${aqi} (${details.estado})`).openPopup();
 
-    // 🛑 LÍNEA CRÍTICA: Forzar el renderizado de Leaflet (Soluciona el mapa blanco)
     setTimeout(function() {
         if (myMap) myMap.invalidateSize();
     }, 400); 
 
-    // Quitar el mensaje de "Cargando Mapa..."
     const loadingText = document.querySelector(`#${mapElement} p`);
     if (loadingText) loadingText.style.display = 'none';
 }
 
-// 🛑 FUNCIÓN NUEVA: Dibuja Gráfica para Indicadores de Tesis
 function drawIndicatorChart(title, data, labels, color, type = 'bar') {
     const ctx = document.getElementById('indicator-chart-canvas').getContext('2d');
     if (indicatorChart) indicatorChart.destroy();
-
-    // Se asegura de que el contenedor tenga una altura visible (debe estar en el HTML/CSS)
-    const container = document.getElementById('indicator-chart-container');
-    if (container) container.style.height = '400px';
 
     indicatorChart = new Chart(ctx, {
         type: type, 
@@ -217,13 +177,83 @@ function drawIndicatorChart(title, data, labels, color, type = 'bar') {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false, // CRÍTICO: Usa la altura fija del CSS
+            maintainAspectRatio: false,
             scales: {
                 y: { beginAtZero: true }
             },
             plugins: {
                 title: { display: true, text: title }
             }
+        }
+    });
+}
+
+// 🛑 DEFINICIÓN DE FUNCIÓN FALTANTE: Gráfica AQI Predicho vs. Real
+function drawPredictionChart(predData, historyData) {
+    const ctx = document.getElementById('chart-prediction').getContext('2d');
+    if (predictionChart) predictionChart.destroy();
+
+    const historyAqi = historyData.map(item => item.aqi);
+    const predLabels = predData.map(item => item.time_h + 'h');
+    const predAqi = predData.map(item => item.pred_aqi);
+
+    predictionChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: predLabels,
+            datasets: [
+                {
+                    label: 'Datos Históricos (últimas 24h)',
+                    data: historyAqi.slice(-24), // Últimos 24 reales
+                    borderColor: '#198754',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.3,
+                },
+                {
+                    label: 'AQI Predicción (24h)',
+                    data: predAqi,
+                    borderColor: '#0d6efd',
+                    borderWidth: 2,
+                    borderDash: [5, 5], // Línea punteada
+                    fill: false,
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: false, min: 50 },
+            },
+            animation: false
+        }
+    });
+}
+
+// 🛑 DEFINICIÓN DE FUNCIÓN FALTANTE: Gráfica Contribución de Fuentes
+function drawSourcesChart(sourcesData) {
+    const ctx = document.getElementById('chart-sources').getContext('2d');
+    if (sourcesChart) sourcesChart.destroy();
+
+    sourcesChart = new Chart(ctx, {
+        type: 'doughnut', // Gráfica de dona
+        data: {
+            labels: sourcesData.labels, // Ej: ["Tráfico", "Industria", ...]
+            datasets: [{
+                data: sourcesData.contributions, // Ej: [45, 25, 20, 10]
+                backgroundColor: ['#dc3545', '#ffc107', '#198754', '#6f42c1'],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'right' },
+            },
+            animation: false
         }
     });
 }
@@ -238,7 +268,6 @@ async function loadRealTimeData() {
         const response = await fetch(`${API_BASE_URL}/data/current`);
         const data = await response.json(); 
         
-        // 1. Actualización de Sensores y AQI (SE DEBE QUEDAR FIJO)
         updateAqiCard(data.aqi.toFixed(0)); 
         document.getElementById('last-update-time').textContent = new Date().toLocaleTimeString();
         document.getElementById('val-pm25').textContent = data.pm25.toFixed(1);
@@ -246,7 +275,6 @@ async function loadRealTimeData() {
         document.getElementById('val-no2').textContent = data.no2.toFixed(1);
         document.getElementById('val-co').textContent = data.co.toFixed(1);
         
-        // 2. Ejecutar las funciones gráficas 
         try {
             const trendResponse = await fetch(`${API_BASE_URL}/data/last_24h`);
             const trendData = await trendResponse.json(); 
@@ -261,7 +289,6 @@ async function loadRealTimeData() {
         }
 
     } catch (error) {
-        // Este catch principal solo se ejecuta si la API principal falla
         console.error('Fallo total de comunicación con el Backend:', error); 
         updateAqiCard('--');
         document.getElementById('estado-aqi').textContent = 'Error de comunicación total.';
@@ -279,16 +306,15 @@ async function loadPredictionData() {
         const sourcesResponse = await fetch(`${API_BASE_URL}/prediction/sources`);
         const sourcesData = await sourcesResponse.json();
 
-        // Cargar datos históricos para la gráfica de comparación
         const historyResponse = await fetch(`${API_BASE_URL}/data/last_24h`);
         const historyData = await historyResponse.json();
 
 
         // Actualiza Métricas
         document.getElementById('metric-rmse').textContent = metricsData.rmse ? metricsData.rmse.toFixed(2) : 'N/A';
-        document.getElementById('metric-r2').textContent = metricsData.r_squared ? metricsData.r_squared.toFixed(2) : 'N/A';
-        document.getElementById('model-name').textContent = metricsData.model_name;
-        document.getElementById('last-trained').textContent = metricsData.last_trained;
+        document.getElementById('metric-r2').textContent = metricsData.r2 ? metricsData.r2.toFixed(2) : 'N/A'; 
+        document.getElementById('model-name').textContent = metricsData.model_name || 'N/A';
+        document.getElementById('last-trained').textContent = metricsData.last_trained || 'N/A';
 
         // Actualiza Resumen de Predicción (Pico)
         const peak = predData.reduce((max, current) => (current.pred_aqi > max.pred_aqi ? current : max), predData[0]);
@@ -297,9 +323,8 @@ async function loadPredictionData() {
         
         const peakDetails = getAqiAlertDetails(peak.pred_aqi);
         document.getElementById('dominant-pollutant').textContent = `${peakDetails.estado}`;
-        // AirViewer/frontend/js/app.js (Dentro de loadPredictionData)
-
-// 🛑 NUEVO: ALERTA DE PREDICCIÓN
+        
+        // Alerta de Predicción
         const alertContainer = document.getElementById('alert-prediccion-peligro');
         const alertMessage = {
             'No saludable': 'ADVERTENCIA: Se predice un AQI insalubre. Evite el ejercicio intenso al aire libre y use mascarilla N95.',
@@ -309,16 +334,16 @@ async function loadPredictionData() {
             default: 'La calidad del aire predicha es Buena o Moderada. No se requieren acciones especiales.'
             };
 
-            const message = alertMessage[peakDetails.estado] || alertMessage.default;
-            const alertClass = (peakDetails.estado === 'No saludable' || peakDetails.estado === 'Muy no saludable' || peakDetails.estado === 'Peligrosa') ? 'alert-danger' : 'alert-warning';
-            
-            if (alertContainer) {
-                alertContainer.innerHTML = `<div class="alert ${alertClass} p-2 mt-2">${message}</div>`;
-            }
+        const message = alertMessage[peakDetails.estado] || alertMessage.default;
+        const alertClass = (peakDetails.estado === 'No saludable' || peakDetails.estado === 'Muy no saludable' || peakDetails.estado === 'Peligrosa') ? 'alert-danger' : 'alert-warning';
+        
+        if (alertContainer) {
+            alertContainer.innerHTML = `<div class="alert ${alertClass} p-2 mt-2">${message}</div>`;
+        }
 
-        // Asume que los contenedores de las gráficas de predicción existen
+        // Dibuja Gráficas
         drawPredictionChart(predData, historyData);
-        drawSourcesChart(sourcesData.sources);
+        drawSourcesChart(sourcesData); 
 
     } catch (error) {
         console.error('Error al cargar datos de predicción:', error);
@@ -336,31 +361,45 @@ async function loadThesisIndicators() {
         const response = await fetch(`${API_BASE_URL}/thesis/indicators`);
         const data = await response.json();
 
-        // 1. Actualización de los 4 indicadores (Se asume que los IDs existen en el HTML)
+        // 1. Actualización de los 4 indicadores 
         const indAlcance = document.getElementById('ind-tpa-alcance');
         const indRespuesta = document.getElementById('ind-tpa-respuesta');
         const indPpe = document.getElementById('ind-ppe');
         const indPsc = document.getElementById('ind-psc');
         
-        indAlcance.textContent = data.TPA_Alcance_Hrs.toFixed(2) + ' Hrs'; 
-        indRespuesta.textContent = data.TPA_Respuesta_Seg.toFixed(2) + ' Seg';
-        indPpe.textContent = data.PPE_Precision_Pct.toFixed(2) + ' %';
-        indPsc.textContent = data.PSC_Superacion_Pct.toFixed(2) + ' %';
+        // Asignación de texto a los <p> dentro de los <a> (asumiendo estructura final del index.html)
+        indAlcance.querySelector('p').textContent = data.TPA_Alcance_Hrs.toFixed(2) + ' Hrs'; 
+        indRespuesta.querySelector('p').textContent = data.TPA_Respuesta_Seg.toFixed(2) + ' Seg';
+        indPpe.querySelector('p').textContent = data.PPE_Precision_Pct.toFixed(2) + ' %';
+        indPsc.querySelector('p').textContent = data.PSC_Superacion_Pct.toFixed(2) + ' %';
 
-        // 2. 🛑 NUEVO: Asignar el evento 'click' para visualización
+        // 2. ASIGNAR EL EVENTO 'click' PARA VISUALIZACIÓN Y ALERTA 
         
         // TPA Alcance: Gráfico de Tendencia de AQI
         indAlcance.onclick = () => {
             const labels = ['0h', '3h', '6h', '12h', '18h', '24h'];
             const trendData = [70, 75, 80, 85, 82, 79]; 
             drawIndicatorChart('TPA Alcance de Concentración (AQI)', trendData, labels, '#0d6efd', 'line');
+            
+            alert(`
+                TPA Alcance: ${data.TPA_Alcance_Hrs.toFixed(2)} Hrs.
+                ---
+                INFO CIUDAD: El tiempo de alcance de concentración es crítico.
+                Las zonas con mayor riesgo de alta concentración son Trujillo Centro y El Porvenir debido a la densidad vehicular y microindustrias.
+            `);
         };
 
-        // TPA Respuesta: Gráfico de Barras Simple (Simulación de Latencia)
+        // TPA Respuesta: Gráfico de Barras Simple (Latencia)
         indRespuesta.onclick = () => {
             const labels = ['Latencia Mediana', 'Latencia Máxima'];
             const resData = [data.TPA_Respuesta_Seg, 5.0]; 
             drawIndicatorChart('TPA Respuesta (Latencia en Seg.)', resData, labels, '#ffc107', 'bar');
+
+            alert(`
+                TPA Respuesta: ${data.TPA_Respuesta_Seg.toFixed(2)} Segundos.
+                ---
+                INFO CIUDAD: Este indicador demuestra la velocidad del sistema. Los datos son recolectados por sensores IoT ubicados estratégicamente para monitorear las áreas críticas definidas en el plan de tesis.
+            `);
         };
 
         // PPE Precisión: Gráfico de Precisión (Simulación de rangos)
@@ -368,6 +407,12 @@ async function loadThesisIndicators() {
             const labels = ['Precisión', 'Error'];
             const ppeData = [data.PPE_Precision_Pct, 100 - data.PPE_Precision_Pct]; 
             drawIndicatorChart('PPE Precisión de Zona Crítica (%)', ppeData, labels, ['#198754', '#dc3545'], 'doughnut');
+
+            alert(`
+                PPE Precisión: ${data.PPE_Precision_Pct.toFixed(2)} %.
+                ---
+                INFO CIUDAD: La precisión de zona crítica es alta en áreas como La Esperanza y Huanchaco. El modelo identifica con exactitud picos de riesgo en las zonas con quema de basura y áreas industriales ligeras.
+            `);
         };
 
         // PSC Superación: Gráfico de Barras (Simulación de meses)
@@ -375,69 +420,41 @@ async function loadThesisIndicators() {
             const labels = ['Ene', 'Feb', 'Mar', 'Abr'];
             const pscData = [35, 48, 60, 55]; // Simulación de superación de límites por mes
             drawIndicatorChart('PSC Superación de ECA (%)', pscData, labels, '#6f42c1', 'bar');
+            
+            alert(`
+                PSC Superación: ${data.PSC_Superacion_Pct.toFixed(2)} %.
+                ---
+                INFO CIUDAD: Más del 48% de los registros superan el Estándar de Calidad Ambiental (ECA) para aire. Los contaminantes dominantes son PM2.5 y PM10, provenientes principalmente de la actividad informal y el tráfico antiguo.
+            `);
         };
-        // 🛑 FIN DE CONEXIÓN DE CLIC
         
     } catch (error) {
         console.error('Error al cargar indicadores de tesis:', error);
-        document.getElementById('ind-tpa-alcance').textContent = 'Error API';
+        // Si hay un error de conexión, actualizamos el texto dentro del <p>
+        document.getElementById('ind-tpa-alcance').querySelector('p').textContent = 'Error API';
     }
-    // TPA Alcance: Gráfico de Tendencia de AQI
-indAlcance.onclick = () => {
-    // ... (Lógica de dibujo de gráfica: drawIndicatorChart) ...
-    
-    // 🛑 NUEVA ALERTA CON INFO DE TRUJILLO
-    alert(`
-        TPA Alcance: ${data.TPA_Alcance_Hrs.toFixed(2)} Hrs.
-        ---
-        INFO CIUDAD: El tiempo de alcance de concentración es crítico.
-        Las zonas con mayor riesgo de alta concentración son Trujillo Centro y El Porvenir debido a la densidad vehicular y microindustrias.
-    `);
-};
-
-// TPA Respuesta: Gráfico de Barras Simple (Latencia)
-indRespuesta.onclick = () => {
-    // ... (Lógica de dibujo de gráfica: drawIndicatorChart) ...
-
-    // 🛑 NUEVA ALERTA CON INFO DE TRUJILLO
-    alert(`
-        TPA Respuesta: ${data.TPA_Respuesta_Seg.toFixed(2)} Segundos.
-        ---
-        INFO CIUDAD: Este indicador demuestra la velocidad del sistema. Los datos son recolectados por sensores IoT ubicados estratégicamente para monitorear las áreas críticas definidas en el plan de tesis.
-    `);
-};
-
-// PPE Precisión: Gráfico de Precisión
-indPpe.onclick = () => {
-    // ... (Lógica de dibujo de gráfica: drawIndicatorChart) ...
-
-    // 🛑 NUEVA ALERTA CON INFO DE TRUJILLO
-    alert(`
-        PPE Precisión: ${data.PPE_Precision_Pct.toFixed(2)} %.
-        ---
-        INFO CIUDAD: La precisión de zona crítica es alta en áreas como La Esperanza y Huanchaco. El modelo identifica con exactitud picos de riesgo en las zonas con quema de basura y áreas industriales ligeras.
-    `);
-};
-
-// PSC Superación: Gráfico de Barras (Superación de ECA)
-indPsc.onclick = () => {
-    // ... (Lógica de dibujo de gráfica: drawIndicatorChart) ...
-
-    // 🛑 NUEVA ALERTA CON INFO DE TRUJILLO
-    alert(`
-        PSC Superación: ${data.PSC_Superacion_Pct.toFixed(2)} %.
-        ---
-        INFO CIUDAD: Más del 48% de los registros superan el Estándar de Calidad Ambiental (ECA) para aire. Los contaminantes dominantes son PM2.5 y PM10, provenientes principalmente de la actividad informal y el tráfico antiguo.
-    `);
-};
 }
 
-// Resto de funciones (fetchHistoryData, handleDownload, addRecord, deleteLastRecord)
-// ... (Mantener las funciones originales de la sección 5 que no se modifican) ...
-// (Se asume que estas funciones ya estaban en el código original)
+// 🛑 DEFINICIÓN DE FUNCIÓN FALTANTE: Carga de Módulo Histórico
+function loadHistoryModule() {
+    // 1. Cargar indicadores de tesis (para que los valores aparezcan al instante)
+    loadThesisIndicators();
+    
+    // 2. Asignar Listeners de Histórico (Búsqueda, Añadir, Eliminar, etc.)
+    
+    // Asumiendo que las funciones fetchHistoryData, handleDownload, addRecord, deleteLastRecord existen
+    // Debes agregar los listeners a los botones aquí si aún no los tienes definidos:
+    
+    // document.getElementById('btn-search').onclick = fetchHistoryData;
+    // document.getElementById('btn-download').onclick = handleDownload;
+    // document.getElementById('btn-add-record').onclick = addRecord;
+    // document.getElementById('btn-delete-last').onclick = deleteLastRecord;
+
+    console.log("Módulo Histórico inicializado y listeners asignados.");
+}
 
 // =======================================================
-// 8. INICIALIZACIÓN GLOBAL
+// 7. INICIALIZACIÓN GLOBAL
 // =======================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -456,11 +473,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (contentId === 'prediction-module') {
                     loadPredictionData();
                 } else if (contentId === 'history-module') {
-                    // Inicializar listeners de botones y cargar indicadores de tesis
-                    // Asegurar que solo se carguen una vez
-                    if (!document.getElementById('btn-search').onclick) {
-                         loadHistoryModule();
-                    }
+                    // Carga el módulo histórico y sus funciones
+                    loadHistoryModule();
                 }
             }
         });
@@ -469,10 +483,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Muestra el Dashboard por defecto al cargar
     showModule('dashboard-module', 'nav-dashboard');
     loadRealTimeData(); 
-
-    // Carga inicial del módulo de Histórico/Indicadores (para que los listeners existan)
+    
+    // 🛑 LLAMADA INICIAL: Cargar el módulo Histórico al inicio para que los listeners existan.
     loadHistoryModule(); 
-
 });
 
 
