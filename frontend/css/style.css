@@ -51,15 +51,12 @@
 #aqi-chart-container {
     /* Fija el tamaño para evitar que se desborde o se "escurra" */
     height: 350px; /* Altura fija recomendada para visualización */
-    min-height: 350px;
     width: 100%; 
-    max-width: 900px; 
-    margin: 0 auto;
-    padding: 10px;
-}
+    }
 
 /* Estilos para el elemento Canvas dentro del contenedor */
 #aqi-chart {
     height: 100% !important;
     width: 100% !important;
 }
+
