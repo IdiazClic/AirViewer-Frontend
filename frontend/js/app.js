@@ -142,6 +142,7 @@ function draw24hTrendChart(data) {
                 y: { min: 50, max: 120 },
                 x: { display: false } // Ocultar etiquetas para limpiar la vista
             },
+            animation: false // Acelera el dibujo y evita fallos.
         }
     });
 }
@@ -407,3 +408,4 @@ document.addEventListener('DOMContentLoaded', () => {
     loadHistoryModule(); 
 
 });
+
