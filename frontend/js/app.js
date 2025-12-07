@@ -254,6 +254,18 @@ function drawSourcesChart(sourcesData) {
     });
 }
 
+// AirViewer/frontend/js/app.js (Modificar la configuración del gráfico)
+
+const aqiChart = new Chart(ctx, {
+    type: 'line',
+    data: data,
+    options: {
+        // 🛑 ESTO ES LO CRÍTICO PARA EL DESBORDE:
+        responsive: true, // Hace que el gráfico se ajuste al tamaño del contenedor
+        maintainAspectRatio: false, // **Permite ignorar la relación de aspecto original y usar la altura fija del CSS**
+        // ... otras opciones ...
+    }
+});
 
 // =======================================================
 // 4. FUNCIONES DE CARGA PRINCIPALES
@@ -528,4 +540,5 @@ document.addEventListener('DOMContentLoaded', () => {
     loadRealTimeData(); 
 
 });
+
 
