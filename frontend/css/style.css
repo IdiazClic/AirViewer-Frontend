@@ -59,4 +59,17 @@
     height: 100% !important;
     width: 100% !important;
 }
+/* --- NUEVOS ESTILOS PARA LA PESTAÑA PREDICCIÓN ML --- */
+/* Contenedor principal de la gráfica Predicción vs. Real */
+#prediction-chart-container {
+    height: 400px; /* Altura fija para el gráfico de líneas */
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+/* Contenedor de la gráfica de Contribución de Fuentes */
+#sources-chart-container {
+    height: 350px; /* Altura fija para el gráfico de dona */
+    width: 100%;
+}
 
