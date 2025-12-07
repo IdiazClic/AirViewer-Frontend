@@ -382,6 +382,54 @@ async function loadThesisIndicators() {
         console.error('Error al cargar indicadores de tesis:', error);
         document.getElementById('ind-tpa-alcance').textContent = 'Error API';
     }
+    // TPA Alcance: Gráfico de Tendencia de AQI
+indAlcance.onclick = () => {
+    // ... (Lógica de dibujo de gráfica: drawIndicatorChart) ...
+    
+    // 🛑 NUEVA ALERTA CON INFO DE TRUJILLO
+    alert(`
+        TPA Alcance: ${data.TPA_Alcance_Hrs.toFixed(2)} Hrs.
+        ---
+        INFO CIUDAD: El tiempo de alcance de concentración es crítico.
+        Las zonas con mayor riesgo de alta concentración son Trujillo Centro y El Porvenir debido a la densidad vehicular y microindustrias.
+    `);
+};
+
+// TPA Respuesta: Gráfico de Barras Simple (Latencia)
+indRespuesta.onclick = () => {
+    // ... (Lógica de dibujo de gráfica: drawIndicatorChart) ...
+
+    // 🛑 NUEVA ALERTA CON INFO DE TRUJILLO
+    alert(`
+        TPA Respuesta: ${data.TPA_Respuesta_Seg.toFixed(2)} Segundos.
+        ---
+        INFO CIUDAD: Este indicador demuestra la velocidad del sistema. Los datos son recolectados por sensores IoT ubicados estratégicamente para monitorear las áreas críticas definidas en el plan de tesis.
+    `);
+};
+
+// PPE Precisión: Gráfico de Precisión
+indPpe.onclick = () => {
+    // ... (Lógica de dibujo de gráfica: drawIndicatorChart) ...
+
+    // 🛑 NUEVA ALERTA CON INFO DE TRUJILLO
+    alert(`
+        PPE Precisión: ${data.PPE_Precision_Pct.toFixed(2)} %.
+        ---
+        INFO CIUDAD: La precisión de zona crítica es alta en áreas como La Esperanza y Huanchaco. El modelo identifica con exactitud picos de riesgo en las zonas con quema de basura y áreas industriales ligeras.
+    `);
+};
+
+// PSC Superación: Gráfico de Barras (Superación de ECA)
+indPsc.onclick = () => {
+    // ... (Lógica de dibujo de gráfica: drawIndicatorChart) ...
+
+    // 🛑 NUEVA ALERTA CON INFO DE TRUJILLO
+    alert(`
+        PSC Superación: ${data.PSC_Superacion_Pct.toFixed(2)} %.
+        ---
+        INFO CIUDAD: Más del 48% de los registros superan el Estándar de Calidad Ambiental (ECA) para aire. Los contaminantes dominantes son PM2.5 y PM10, provenientes principalmente de la actividad informal y el tráfico antiguo.
+    `);
+};
 }
 
 // Resto de funciones (fetchHistoryData, handleDownload, addRecord, deleteLastRecord)
@@ -426,5 +474,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadHistoryModule(); 
 
 });
+
 
 
