@@ -297,6 +297,24 @@ async function loadPredictionData() {
         
         const peakDetails = getAqiAlertDetails(peak.pred_aqi);
         document.getElementById('dominant-pollutant').textContent = `${peakDetails.estado}`;
+        // AirViewer/frontend/js/app.js (Dentro de loadPredictionData)
+
+// 🛑 NUEVO: ALERTA DE PREDICCIÓN
+        const alertContainer = document.getElementById('alert-prediccion-peligro');
+        const alertMessage = {
+            'No saludable': 'ADVERTENCIA: Se predice un AQI insalubre. Evite el ejercicio intenso al aire libre y use mascarilla N95.',
+            'Muy no saludable': 'ALERTA ROJA: Se predice un nivel de riesgo muy alto. Permanezca en interiores y cierre ventanas.',
+            'Peligrosa': 'EMERGENCIA: Nivel de contaminación peligroso. Evacúe a zonas con mejor calidad de aire si es posible.',
+            'No saludable para grupos sensibles': 'Precaución: Grupos sensibles (niños, ancianos) deben limitar la actividad al aire libre.',
+            default: 'La calidad del aire predicha es Buena o Moderada. No se requieren acciones especiales.'
+            };
+
+            const message = alertMessage[peakDetails.estado] || alertMessage.default;
+            const alertClass = (peakDetails.estado === 'No saludable' || peakDetails.estado === 'Muy no saludable' || peakDetails.estado === 'Peligrosa') ? 'alert-danger' : 'alert-warning';
+            
+            if (alertContainer) {
+                alertContainer.innerHTML = `<div class="alert ${alertClass} p-2 mt-2">${message}</div>`;
+            }
 
         // Asume que los contenedores de las gráficas de predicción existen
         drawPredictionChart(predData, historyData);
@@ -408,4 +426,5 @@ document.addEventListener('DOMContentLoaded', () => {
     loadHistoryModule(); 
 
 });
+
 
