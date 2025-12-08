@@ -323,7 +323,27 @@ async function loadPredictionData() {
         
         const peakDetails = getAqiAlertDetails(peak.pred_aqi);
         document.getElementById('dominant-pollutant').textContent = `${peakDetails.estado}`;
-        
+
+        // 🛑 PASO 2: Aplicar la clase dinámica a las tarjetas de predicción
+
+// Tarjeta 1: Pico de Contaminación Predicho (ID: pred-peak-card)
+const peakCard = document.getElementById('pred-peak-card'); // Necesitas agregar este ID en index.html
+if (peakCard) {
+    // Primero, elimina cualquier clase de color antigua
+    peakCard.classList.remove('bg-warning', 'text-dark', 'bg-success', 'bg-danger', 'bg-info'); 
+    peakCard.classList.remove('aqi-buena', 'aqi-moderada', 'aqi-sensible', 'aqi-insalubre', 'aqi-muy-insalubre', 'aqi-peligrosa');
+    
+    // Añade la nueva clase de color
+    peakCard.classList.add(peakDetails.class);
+    // Asegura que el texto sea blanco para el contraste si el color es oscuro
+    peakCard.classList.add('text-white'); 
+    
+    // Si el color es amarillo/moderada, el texto debe ser oscuro
+    if (peakDetails.estado === 'Moderada') {
+        peakCard.classList.remove('text-white');
+        peakCard.classList.add('text-dark');
+    }
+}
         // Alerta de Predicción
         const alertContainer = document.getElementById('alert-prediccion-peligro');
         const alertMessage = {
@@ -350,7 +370,6 @@ async function loadPredictionData() {
         document.getElementById('model-name').textContent = 'Error de conexión con el modelo.';
     }
 }
-
 
 // =======================================================
 // 5. FUNCIONES DE HISTÓRICO E INDICADORES DE TESIS
@@ -493,6 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     // =======================================================
 });
+
 
 
 
