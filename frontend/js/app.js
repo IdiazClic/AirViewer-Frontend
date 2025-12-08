@@ -384,8 +384,7 @@ async function loadThesisIndicators() {
             alert(`
                 TPA Alcance: ${data.TPA_Alcance_Hrs.toFixed(2)} Hrs.
                 ---
-                INFO CIUDAD: El tiempo de alcance de concentración es crítico.
-                Las zonas con mayor riesgo de alta concentración son Trujillo Centro y El Porvenir debido a la densidad vehicular y microindustrias.
+                INFO CIUDAD: Este tiempo es crítico. Las zonas con mayor riesgo de alta concentración son Trujillo Centro, El Porvenir y **Salaverry** (por actividades portuarias y tráfico pesado), afectando el tiempo promedio de alerta.
             `);
         };
 
@@ -398,7 +397,7 @@ async function loadThesisIndicators() {
             alert(`
                 TPA Respuesta: ${data.TPA_Respuesta_Seg.toFixed(2)} Segundos.
                 ---
-                INFO CIUDAD: Este indicador demuestra la velocidad del sistema. Los datos son recolectados por sensores IoT ubicados estratégicamente para monitorear las áreas críticas definidas en el plan de tesis.
+                INFO CIUDAD: Este indicador demuestra la velocidad de la red IoT. Los sensores están ubicados en áreas críticas como las inmediaciones del **Mercado Hermelinda** y puntos de congestión vehicular para garantizar una rápida respuesta.
             `);
         };
 
@@ -411,7 +410,7 @@ async function loadThesisIndicators() {
             alert(`
                 PPE Precisión: ${data.PPE_Precision_Pct.toFixed(2)} %.
                 ---
-                INFO CIUDAD: La precisión de zona crítica es alta en áreas como La Esperanza y Huanchaco. El modelo identifica con exactitud picos de riesgo en las zonas con quema de basura y áreas industriales ligeras.
+                INFO CIUDAD: La precisión de zona crítica es alta. El modelo identifica con exactitud picos de riesgo en las zonas de quema de basura y áreas industriales ligeras alrededor de **El Porvenir**, **Salaverry**, **Laredo** y **La Esperanza**.
             `);
         };
 
@@ -424,7 +423,7 @@ async function loadThesisIndicators() {
             alert(`
                 PSC Superación: ${data.PSC_Superacion_Pct.toFixed(2)} %.
                 ---
-                INFO CIUDAD: Más del 48% de los registros superan el Estándar de Calidad Ambiental (ECA) para aire. Los contaminantes dominantes son PM2.5 y PM10, provenientes principalmente de la actividad informal y el tráfico antiguo.
+                INFO CIUDAD: Más del 48% de los registros superan el Estándar de Calidad Ambiental (ECA). Los focos de mayor superación se concentran en **Salaverry**, **Laredo**, **Moche** y en las vías de acceso al **Mercado Hermelinda**, debido a emisiones de PM2.5 y PM10.
             `);
         };
         
@@ -487,6 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 🛑 LLAMADA INICIAL: Cargar el módulo Histórico al inicio para que los listeners existan.
     loadHistoryModule(); 
 });
+
 
 
 
