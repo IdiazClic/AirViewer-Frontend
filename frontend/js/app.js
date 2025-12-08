@@ -318,7 +318,7 @@ async function loadPredictionData() {
 
         // Actualiza Resumen de Predicción (Pico)
         const peak = predData.reduce((max, current) => (current.pred_aqi > max.pred_aqi ? current : max), predData[0]);
-        document.getElementById('pred-aqi-peak').textContent = peak.pred_aqi;
+        document.getElementById('pred-aqi-peak').textContent = peak.pred_aqi.toFixed(0);
         document.getElementById('pred-time').textContent = `mañana a las ${peak.time_h}:00h`;
         
         const peakDetails = getAqiAlertDetails(peak.pred_aqi);
@@ -417,8 +417,8 @@ async function loadThesisIndicators() {
 
         // PSC Superación: Gráfico de Barras (Simulación de meses)
         indPsc.onclick = () => {
-            const labels = ['Ene', 'Feb', 'Mar', 'Abr'];
-            const pscData = [35, 48, 60, 55]; // Simulación de superación de límites por mes
+            const labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const pscData = [35, 48, 60, 55, 62, 70, 68, 65, 58, 52, 45, 40]; 
             drawIndicatorChart('PSC Superación de ECA (%)', pscData, labels, '#6f42c1', 'bar');
             
             alert(`
@@ -487,6 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 🛑 LLAMADA INICIAL: Cargar el módulo Histórico al inicio para que los listeners existan.
     loadHistoryModule(); 
 });
+
 
 
 
