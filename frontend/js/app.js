@@ -485,7 +485,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 🛑 LLAMADA INICIAL: Cargar el módulo Histórico al inicio para que los listeners existan.
     loadHistoryModule(); 
+    
+    // =======================================================
+    // 🛑 PUNTO DE INSERCIÓN 🛑: Aquí se inicializan los Tooltips de Bootstrap
+    // Esto es NECESARIO para que los tooltips (como los de RMSE y R2) se muestren.
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+    // =======================================================
 });
+
 
 
 
