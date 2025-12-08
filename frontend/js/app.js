@@ -440,14 +440,12 @@ function loadHistoryModule() {
     loadThesisIndicators();
     
     // 2. Asignar Listeners de Histórico (Búsqueda, Añadir, Eliminar, etc.)
-    
+    document.getElementById('btn-search').onclick = handleSearchClick; 
+    document.getElementById('btn-download').onclick = handleDownload;
+    document.getElementById('btn-add-record').onclick = addRecord;
+    document.getElementById('btn-delete-last').onclick = deleteLastRecord;
     // Asumiendo que las funciones fetchHistoryData, handleDownload, addRecord, deleteLastRecord existen
-    // Debes agregar los listeners a los botones aquí si aún no los tienes definidos:
-    
-    // document.getElementById('btn-search').onclick = fetchHistoryData;
-    // document.getElementById('btn-download').onclick = handleDownload;
-    // document.getElementById('btn-add-record').onclick = addRecord;
-    // document.getElementById('btn-delete-last').onclick = deleteLastRecord;
+    fetchHistoryData(); 
 
     console.log("Módulo Histórico inicializado y listeners asignados.");
 }
@@ -495,6 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     // =======================================================
 });
+
 
 
 
